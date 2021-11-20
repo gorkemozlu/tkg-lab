@@ -41,8 +41,10 @@ then
 
   export DOMAIN_FILTER=--domain-filter=$(yq e .subdomain $PARAMS_YAML)
   export PROJECT_ID=--google-project=$(yq e .gcloud.project $PARAMS_YAML)
+  export CLUSTER_NAME1=--txt-owner-id=$CLUSTER_NAME
   yq e -i '.deployment.args[3] = env(DOMAIN_FILTER)' generated/$CLUSTER_NAME/external-dns/external-dns-data-values.yaml
   yq e -i '.deployment.args[6] = env(PROJECT_ID)' generated/$CLUSTER_NAME/external-dns/external-dns-data-values.yaml
+  yq e -i '.deployment.args[8] = env(CLUSTER_NAME1)' generated/$CLUSTER_NAME/external-dns/external-dns-data-values.yaml
 
 else # Using AWS Route53
 
