@@ -45,6 +45,8 @@ then
   export SSH_KEY_NAME=tkg-$(yq e .environment-name $PARAMS_YAML)-default
   export AWS_CONTROL_PLANE_MACHINE_TYPE=$(yq e .aws.control-plane-machine-type $PARAMS_YAML)
   export AWS_NODE_MACHINE_TYPE=$(yq e .aws.node-machine-type $PARAMS_YAML)
+  export supervisor_svc_endpoint=$(kubectl get svc pinniped-supervisor -n pinniped-supervisor -ojsonpath="{.status.loadBalancer.ingress[0].hostname}")
+  
 
   yq e -i '.AWS_VPC_ID = env(VPC_ID)' generated/$CLUSTER/cluster-config.yaml
   yq e -i '.AWS_PUBLIC_SUBNET_ID = env(PUBLIC_SUBNET_ID)' generated/$CLUSTER/cluster-config.yaml
@@ -55,6 +57,8 @@ then
   yq e -i '.WORKER_MACHINE_COUNT = env(WORKER_REPLICAS)' generated/$CLUSTER/cluster-config.yaml
   yq e -i '.CONTROL_PLANE_MACHINE_TYPE = env(AWS_CONTROL_PLANE_MACHINE_TYPE)' generated/$CLUSTER/cluster-config.yaml
   yq e -i '.NODE_MACHINE_TYPE = env(AWS_NODE_MACHINE_TYPE)' generated/$CLUSTER/cluster-config.yaml
+  yq e -i '.pinniped.supervisor_svc_endpoint = env(supervisor_svc_endpoint)' generated/$CLUSTER/cluster-config.yaml
+  yq e -i '.supervisor_svc_endpoint = env(supervisor_svc_endpoint)' generated/$CLUSTER/cluster-config.yaml
 
   tanzu cluster create --file=generated/$CLUSTER/cluster-config.yaml $KUBERNETES_VERSION_FLAG_AND_VALUE -v 6
 

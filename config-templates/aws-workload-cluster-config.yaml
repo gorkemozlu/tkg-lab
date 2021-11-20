@@ -14,3 +14,6 @@ TKG_HTTP_PROXY_ENABLED: "false" # default is blank
 ENABLE_MHC: "true" # default is blank
 BASTION_HOST_ENABLED: false # default is true
 IDENTITY_MANAGEMENT_TYPE: oidc
+
+pinniped.supervisor_svc_endpoint: url
+supervisor_svc_endpoint: url
