@@ -27,5 +27,5 @@ helm repo add argo https://argoproj.github.io/argo-helm
 helm upgrade --install argocd argo/argo-cd \
   -f generated/$CLUSTER_NAME/argocd/values.yaml \
   --namespace argocd \
-  --version "3.5.0"
+  --version "3.26.7"
 kubectl apply -f generated/$CLUSTER_NAME/argocd/httpproxy.yaml
