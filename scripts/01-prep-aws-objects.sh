@@ -6,6 +6,7 @@ source $TKG_LAB_SCRIPTS/set-env.sh
 export AWS_REGION=$(yq e .aws.region $PARAMS_YAML)
 export AWS_ACCESS_KEY_ID=$(yq e .aws.access-key-id $PARAMS_YAML)
 export AWS_SECRET_ACCESS_KEY=$(yq e .aws.secret-access-key $PARAMS_YAML)
+export AWS_SESSION_TOKEN=$(yq e .aws.session-token $PARAMS_YAML)
 
 tanzu management-cluster permissions aws set
 
