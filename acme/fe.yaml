@@ -1,0 +1,129 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app: acmefit
+  name: cart-redis-pass
+  namespace: acme-gns
+data:
+  password: S2VlcEl0U2ltcGxlMSE=
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app: acmefit
+  name: catalog-mongo-pass
+  namespace: acme-gns
+data:
+  password: S2VlcEl0U2ltcGxlMSE=
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app: acmefit
+  name: order-postgres-pass
+  namespace: acme-gns
+data:
+  password: S2VlcEl0U2ltcGxlMSE=
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app: acmefit
+  name: users-mongo-pass
+  namespace: acme-gns
+data:
+  password: S2VlcEl0U2ltcGxlMSE=
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app: acmefit
+  name: users-redis-pass
+  namespace: acme-gns
+data:
+  password: S2VlcEl0U2ltcGxlMSE=
+type: Opaque
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  labels:
+    app: acmefit
+    service: frontend
+  namespace: acme-gns
+spec:
+  ports:
+  - name: http-frontend
+    protocol: TCP
+    port: 3000
+    targetPort: 3000
+  selector:
+    app: acmefit
+    service: frontend
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    app: acmefit
+    service: frontend
+  namespace: acme-gns
+spec:
+  selector:
+    matchLabels:
+      app: acmefit
+      service: frontend
+  strategy:
+    type: Recreate
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: acmefit
+        service: frontend
+        app.kubernetes.io/part-of: acme-fitness
+    spec:
+      containers:
+      - image: gcr.io/vmwarecloudadvocacy/acmeshop-front-end:latest
+        name: frontend
+        env:
+        - name: FRONTEND_PORT
+          value: "3000"
+        - name: USERS_HOST
+          value: 'users.example.com'
+        - name: CATALOG_HOST
+          value: 'catalog.example.com'
+        - name: ORDER_HOST
+          value: 'order.example.com'
+        - name: CART_HOST
+          value: 'cart.example.com'
+        - name: USERS_PORT
+          value: "8083"
+        - name: CATALOG_PORT
+          value: "8082"
+        - name: CART_PORT
+          value: "5000"
+        - name: ORDER_PORT
+          value: "6000"
+        - name: JAEGER_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: JAEGER_AGENT_PORT
+          value: "6832"
+        ports:
+        - containerPort: 3000
+          name: http-shopping

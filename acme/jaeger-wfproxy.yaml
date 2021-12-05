@@ -1,0 +1,210 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: jaeger-agent
+  namespace: acme-gns
+  labels:
+    app: jaeger-agent
+    jaeger-infra: agent-daemonset
+spec:
+  selector:
+    matchLabels:
+      app: jaeger-agent
+  template:
+    metadata:
+      labels:
+        app: jaeger-agent
+    spec:
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
+      containers:
+      - name: jaeger-agent
+        image: jaegertracing/jaeger-agent:1.16.0
+        imagePullPolicy: IfNotPresent
+        args:
+        - --reporter.tchannel.host-port=wavefront-proxy.tanzu-observability-saas:30001
+        - --reporter.type=tchannel
+        - --log-level=debug
+        ports:
+        - containerPort: 5778
+          name: config-rest
+          protocol: TCP
+        - containerPort: 6831
+          name: jg-compact-trft
+          protocol: UDP
+        - containerPort: 6832
+          name: jg-binary-trft
+          protocol: UDP
+        - containerPort: 14271
+          name: admin-http
+          protocol: TCP
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: wavefront
+---
+# Source: wavefront/templates/proxy-preprocessor-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/name : wavefront
+    helm.sh/chart: wavefront-1.7.5
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io.instance: "wavefront"
+    app.kubernetes.io/component: proxy
+  name: wavefront-proxy-preprocessor
+  namespace: tanzu-observability-saas
+data:
+  rules.yaml: |
+    '30001':
+    - rule    : drop-cluster-none
+      action  : spanDropTag
+      key     : cluster
+    - rule    : drop-shard-none
+      action  : spanDropTag
+      key     : shard
+    - rule    : cluster-span-tag
+      action  : spanAddTag
+      key     : cluster
+      value   : gregoryan-tkg-wlc
+    - rule    : cluster-shard-tag
+      action  : spanAddTag
+      key     : shard
+      value   : development
+---
+# Source: wavefront/templates/api-token-secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/name : wavefront
+    helm.sh/chart: wavefront-1.7.5
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io.instance: "wavefront"
+    app.kubernetes.io/component: collector
+  name: wavefront
+  namespace: tanzu-observability-saas
+type: Opaque
+data:
+  api-token: "CHANGEMEAPITOKENBASE64VALUE"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name : wavefront
+    helm.sh/chart: wavefront-1.7.5
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io.instance: "wavefront"
+    app.kubernetes.io/component: proxy
+  name: wavefront-proxy
+  namespace: tanzu-observability-saas
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name : wavefront
+      app.kubernetes.io/component: proxy
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name : wavefront
+        app.kubernetes.io/component: proxy
+    spec:
+      containers:
+      - name: wavefront-proxy
+        image: wavefronthq/proxy:5.7
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: WAVEFRONT_URL
+          value: https://vmware.wavefront.com/api
+        - name: WAVEFRONT_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: wavefront
+              key: api-token
+        - name: WAVEFRONT_PROXY_ARGS
+          value: --traceJaegerApplicationName gorkemo-acme-fitness --traceListenerPorts 30000 --traceJaegerListenerPorts 30001 --traceZipkinListenerPorts 9411 --histogramDistListenerPorts 40000 --histogramMinuteListenerPorts 40001 --histogramHourListenerPorts 40002 --histogramDayListenerPorts 40003 --deltaCounterPorts 50000 --preprocessorConfigFile /etc/wavefront/wavefront-proxy/preprocessor/rules.yaml
+        ports:
+        - containerPort: 2878
+          protocol: TCP
+        - containerPort: 30000
+          protocol: TCP
+        - containerPort: 30001
+          protocol: TCP
+        - containerPort: 9411
+          protocol: TCP
+        - containerPort: 40000
+          protocol: TCP
+        - containerPort: 40001
+          protocol: TCP
+        - containerPort: 40002
+          protocol: TCP
+        - containerPort: 40003
+          protocol: TCP
+        - containerPort: 50000
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 4Gi
+          requests:
+            cpu: 100m
+            memory: 1Gi
+        securityContext:
+          privileged: false
+        volumeMounts:
+        - name: preprocessor
+          mountPath: /etc/wavefront/wavefront-proxy/preprocessor
+      volumes:
+      - name: preprocessor
+        configMap:
+          name: wavefront-proxy-preprocessor
+---
+# Source: wavefront/templates/proxy-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name : wavefront
+    helm.sh/chart: wavefront-1.7.5
+    app.kubernetes.io/managed-by: "Helm"
+    app.kubernetes.io.instance: "wavefront"
+    app.kubernetes.io/component: proxy
+  name: wavefront-proxy
+  namespace: tanzu-observability-saas
+spec:
+  ports:
+  - name: wavefront
+    port: 2878
+    protocol: TCP
+  - name: wavefront-trace
+    port: 30000
+    protocol: TCP
+  - name: jaeger
+    port: 30001
+    protocol: TCP
+  - name: zipkin
+    port: 9411
+    protocol: TCP
+  - name: histogram
+    port: 40000
+    protocol: TCP
+  - name: histogram-minute
+    port: 40001
+    protocol: TCP
+  - name: histogram-hour
+    port: 40002
+    protocol: TCP
+  - name: histogram-day
+    port: 40003
+    protocol: TCP
+  - name: delta-counter
+    port: 50000
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name : wavefront
+    app.kubernetes.io/component: proxy
+  type: ClusterIP
