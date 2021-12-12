@@ -1,0 +1,19 @@
+apiVersion: sql.tanzu.vmware.com/v1
+kind: Postgres
+metadata:
+  name: postgres-sample
+spec:
+  storageClassName: default
+  storageSize: 800M
+  monitorStorageClassName: default
+  monitorStorageSize: 1G
+  pgConfig:
+    dbname: postgres-sample
+    username: pgadmin
+  postgresVersion:
+    name: postgres-14 # View available versions with `kubectl get postgresversion`
+  serviceType: LoadBalancer
+  #highAvailability:
+  #   enabled: true
+  backupLocation:
+     name: backuplocation-sample

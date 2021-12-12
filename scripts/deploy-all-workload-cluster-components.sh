@@ -35,9 +35,12 @@ $TKG_LAB_SCRIPTS/generate-and-apply-grafana-yaml.sh \
 # Workload Step 8
 $TKG_LAB_SCRIPTS/dataprotection.sh $(yq e .workload-cluster.name $PARAMS_YAML)
 
-# Deploy Azure DevOps Agent + kpack
+# Deploy Azure DevOps Agent
 $TKG_LAB_SCRIPTS/deploy-azdevops-agent.sh \
   $(yq e .workload-cluster.name $PARAMS_YAML) \
   $(yq e .azdevops.pat-token $PARAMS_YAML) \
     $(yq e .azdevops.url $PARAMS_YAML)
 
+# Deploy TDS - Postgres
+$TKG_LAB_SCRIPTS/deploy-tds-postgres.sh \
+  $(yq e .workload-cluster.name $PARAMS_YAML)
