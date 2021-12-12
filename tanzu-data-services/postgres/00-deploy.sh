@@ -13,8 +13,8 @@ kubectl config use-context $CLUSTER_NAME-admin@$CLUSTER_NAME
 export HELM_EXPERIMENTAL_OCI=1
 
 helm registry login registry.pivotal.io \
-  --username=$(yq e .tbs.tanzunet-user $PARAMS_YAML) \
-  --password=$(yq e .tbs.tanzunet-pass $PARAMS_YAML)
+  --username=$(yq e .tanzu-net.user $PARAMS_YAML) \
+  --password=$(yq e .tanzu-net.pass $PARAMS_YAML)
 
 #kubectl create secret docker-registry regsecret \
 #    --docker-server=${HARBOR_URL} \
