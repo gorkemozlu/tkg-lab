@@ -49,4 +49,4 @@ then
 fi
 
 
-locust --host=https://${ACME_FQDN} acme/locustfile.py
+locust --host=https://${ACME_FQDN}
