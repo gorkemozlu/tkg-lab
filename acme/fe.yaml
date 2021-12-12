@@ -124,6 +124,8 @@ spec:
               fieldPath: status.hostIP
         - name: JAEGER_AGENT_PORT
           value: "6832"
+        - name: BANNER_TEXT
+          value: FRONTEND
         ports:
         - containerPort: 3000
           name: http-shopping
