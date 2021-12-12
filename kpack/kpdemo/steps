@@ -1,0 +1,14 @@
+# kubectl edit cm -n kpack
+# gcr.io/cf-build-service-public/kpack/lifecycle@sha256:ec826b2e03195ccae434c95f42b42f72d4fc421e50d04d57a9a8c2e8a7d4afcf
+
+# create a project at harbor with public
+./kpdemo serve
+./kpdemo populate --registry harbor.dorn.gorke.ml/nodejs --count 4
+
+# copy the "run image" by clicking "image name"
+# paste it to the "stack (run image)" in setup menu, then save
+./kpdemo update-stack
+
+# copy one of the "buildpacks" by clicking "image name"
+# paste it to "Buildpack ID" and "Buildpack Version" by separating image and version
+./kpdemo update-buildpack --buildpack paketo-buildpacks/nginx
