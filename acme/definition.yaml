@@ -1,0 +1,26 @@
+---
+apiVersion: autoscaling.tsm.tanzu.vmware.com/v1alpha1
+kind: Definition
+metadata:
+  name: autoscale-frontend-gorkemo
+  namespace: acme-gns
+  labels:
+    app: acmefit
+    service: frontend
+spec:
+  scaleTargetRef:
+    kubernetes:
+      kind: Deployment
+      name: frontend
+  scaleRule:
+    mode: EFFICIENCY
+    enabled: true
+    instances:
+      min: 1
+      max: 5
+    trigger:
+      gracePeriodSeconds: 60
+      metric:
+        name: Requests
+        scaleUp: 10
+        scaleDown: 5
