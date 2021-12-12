@@ -18,8 +18,8 @@ ytt -f /tmp/bundle/values.yaml \
         -v kp_default_repository_username='admin' \
         -v kp_default_repository_password=$(yq e .tbs.harbor-pass $PARAMS_YAML) \
         -v pull_from_kp_default_repo=true \
-        -v tanzunet_username=$(yq e .tbs.tanzunet-user $PARAMS_YAML) \
-        -v tanzunet_password=$(yq e .tbs.tanzunet-pass $PARAMS_YAML) \
+        -v tanzunet_username=$(yq e .tanzu-net.user $PARAMS_YAML) \
+        -v tanzunet_password=$(yq e .tanzu-net.pass $PARAMS_YAML) \
         | kbld -f /tmp/bundle/.imgpkg/images.yml -f- \
         | kapp deploy -a tanzu-build-service -f- -y
 
