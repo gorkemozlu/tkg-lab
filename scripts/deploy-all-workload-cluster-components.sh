@@ -44,3 +44,7 @@ $TKG_LAB_SCRIPTS/deploy-azdevops-agent.sh \
 # Deploy TDS - Postgres
 $TKG_LAB_SCRIPTS/deploy-tds-postgres.sh \
   $(yq e .workload-cluster.name $PARAMS_YAML)
+
+# Deploy TDS - Rabbitmq
+$TKG_LAB_SCRIPTS/deploy-tds-rabbitmq.sh \
+  $(yq e .workload-cluster.name $PARAMS_YAML)
