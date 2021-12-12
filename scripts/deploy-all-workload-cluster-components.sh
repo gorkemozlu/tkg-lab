@@ -48,3 +48,7 @@ $TKG_LAB_SCRIPTS/deploy-tds-postgres.sh \
 # Deploy TDS - Rabbitmq
 $TKG_LAB_SCRIPTS/deploy-tds-rabbitmq.sh \
   $(yq e .workload-cluster.name $PARAMS_YAML)
+
+# Deploy TDS - mysql
+$TKG_LAB_SCRIPTS/deploy-tds-mysql.sh \
+  $(yq e .workload-cluster.name $PARAMS_YAML)
