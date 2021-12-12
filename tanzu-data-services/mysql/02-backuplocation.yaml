@@ -1,0 +1,24 @@
+---
+apiVersion: with.sql.tanzu.vmware.com/v1
+kind: MySQLBackupLocation
+metadata:
+  name: mysql-backuplocation-sample
+spec:
+  storage:
+    s3:
+      bucket: "minio"
+      bucketPath: "/velero-highgarden/mysql-backup"
+      region: "highgarden"
+      endpoint: "highgarden.gorke.ml"
+      forcePathStyle: false
+      #enableSSL: true
+      secret:
+        name: mysql-backuplocation-creds-sample
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-backuplocation-creds-sample
+stringData:
+  accessKeyId: "admin"
+  secretAccessKey: "pass"
