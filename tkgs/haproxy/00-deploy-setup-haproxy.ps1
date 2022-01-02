@@ -1,4 +1,9 @@
- $DiskFormat = "Thin"
+#Install-Module -Name VMware.WorkloadManagement
+#Find-Module "VMware.PowerCLI" | Install-Module -Scope "CurrentUser" -AllowClobber
+#Import-Module VMware.PowerCLI
+#Import-Module VMware.WorkloadManagement
+# https://github.com/haproxytech/vmware-haproxy/releases
+$DiskFormat = "Thin"
 $VMname = "haproxy"
 $ovfPath =  "/home/ubuntu/haproxy-v0.2.0.ova"
 $vc="vcsa-01.haas-509.pez.vmware.com"

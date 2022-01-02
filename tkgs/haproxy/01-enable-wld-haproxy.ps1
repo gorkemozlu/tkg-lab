@@ -1,4 +1,12 @@
- $DiskFormat = "Thin"                                                                                                                                                                  $VMname = "haproxy"                                                                                                                                                                    $ovfPath =  "/home/ubuntu/haproxy-v0.2.0.ova"                                                                                                                                          
+#Install-Module -Name VMware.WorkloadManagement
+#Find-Module "VMware.PowerCLI" | Install-Module -Scope "CurrentUser" -AllowClobber
+#Import-Module VMware.PowerCLI
+#Import-Module VMware.WorkloadManagement
+# ssh root@haproxy
+# tail -f /var/log/cloud-init.log
+# systemctl list-units --state failed
+#  cat /etc/haproxy/server.crt
+$DiskFormat = "Thin"                                                                                                                                                                  $VMname = "haproxy"                                                                                                                                                                    $ovfPath =  "/home/ubuntu/haproxy-v0.2.0.ova"                                                                                                                                          
 $vc="vcsa-01.haas-509.pez.vmware.com"
 $vc_user="administrator@vsphere.local"
 $vc_password="pass"

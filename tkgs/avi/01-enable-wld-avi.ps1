@@ -1,12 +1,14 @@
 
 #Install-Module -Name VMware.WorkloadManagement
 #Find-Module "VMware.PowerCLI" | Install-Module -Scope "CurrentUser" -AllowClobber
+#Import-Module VMware.PowerCLI
+#Import-Module VMware.WorkloadManagement
 $vc="vcsa-01.haas-509.pez.vmware.com"
 $vc_user="administrator@vsphere.local"
 $vc_password="pass"
 Connect-VIServer -User $vc_user -Password $vc_password -Server $vc
 $VMCluster = Get-Cluster  -Name "Cluster"
-Import-Module VMware.WorkloadManagement
+
 
 $vSphereWithTanzuParams = @{
     TanzuvCenterServer = "vcsa-01.haas-509.pez.vmware.com";

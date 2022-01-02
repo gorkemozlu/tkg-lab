@@ -1,7 +1,10 @@
+#Install-Module -Name VMware.WorkloadManagement
+#Find-Module "VMware.PowerCLI" | Install-Module -Scope "CurrentUser" -AllowClobber
+#Import-Module VMware.PowerCLI
+#Import-Module VMware.WorkloadManagement
 
 $NSXAdvLBOVA = "/home/ubuntu/tool/controller-21.1.3-9051.ova"
 
-Import-Module VMware.PowerCLI
 
 # VCSA Deployment Configuration
 
