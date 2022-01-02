@@ -2,9 +2,9 @@ iaas: aws # aws or vsphere
 vmware-id: dpfeffer
 environment-name: tkg-aws-e2-lab # used for aws ssh key name
 subdomain: tkg-aws-e2-lab.winterfell.live
-lets-encrypt-acme-email: dpfeffer@vmware.com
+lets-encrypt-acme-email: asd@vmware.com
 dns:
-  provider: aws-route53
+  provider: gcloud-dns
 tmc:
   cluster-group: se-dpfeffer-dev # scripts will create this cluster group if it doesn't already exist
   data-protection-backup-location-name: REDACTED # used by TMC data protection, fill in the name of a TMC data protection credential
@@ -72,6 +72,55 @@ workload-cluster:
   controlplane-endpoint: 192.168.7.182 # only required for vsphere iaas, must belog to avi-management-cluster-vip-network-cidr
   kubernetes-version: # To Explicitly set a kubernetes version use`tanzu kubernetes-release get` and choose the appropriate value from the name column
   antrea-nodeportlocal-enabled: false
+workload-cluster-sm1:
+  worker-replicas: 1
+  worker-replicas-max: 3
+  worker-autoscaler-enabled: true
+  name: essos
+  ingress-fqdn: '*.essos.winterfell.live'
+  prometheus-fqdn: prometheus.essos.winterfell.live # Leave this blank if you choose not to expose prometheus
+  grafana-fqdn: grafana.essos.winterfell.live
+  controlplane-endpoint: 192.168.7.182 # only required for vsphere iaas, must belog to avi-management-cluster-vip-network-cidr
+  kubernetes-version: v1.20.8---vmware.1-tkg.2 # To Explicitly set a kubernetes version use`tanzu kubernetes-release get` and choose the appropriate value from the name column
+  antrea-nodeportlocal-enabled: false
+  sm-type: frontend
+  acme-fqdn: acme.essos.winterfell.live
+workload-cluster-sm2:
+  worker-replicas: 1
+  worker-replicas-max: 3
+  worker-autoscaler-enabled: true
+  name: westeros
+  ingress-fqdn: '*.westeros.winterfell.live'
+  prometheus-fqdn: prometheus.westeros.winterfell.live # Leave this blank if you choose not to expose prometheus
+  grafana-fqdn: grafana.westeros.winterfell.live
+  controlplane-endpoint: 192.168.7.182 # only required for vsphere iaas, must belog to avi-management-cluster-vip-network-cidr
+  kubernetes-version: v1.20.8---vmware.1-tkg.2 # To Explicitly set a kubernetes version use`tanzu kubernetes-release get` and choose the appropriate value from the name column
+  antrea-nodeportlocal-enabled: false
+  sm-type: backend
+workload-cluster-sm3:
+  worker-replicas: 1
+  worker-replicas-max: 3
+  worker-autoscaler-enabled: true
+  name: sm3
+  ingress-fqdn: '*.sm3.winterfell.live'
+  prometheus-fqdn: prometheus.sm3.winterfell.live # Leave this blank if you choose not to expose prometheus
+  grafana-fqdn: grafana.sm3.winterfell.live
+  controlplane-endpoint: 192.168.7.182 # only required for vsphere iaas, must belog to avi-management-cluster-vip-network-cidr
+  kubernetes-version: v1.20.8---vmware.1-tkg.2 # To Explicitly set a kubernetes version use`tanzu kubernetes-release get` and choose the appropriate value from the name column
+  antrea-nodeportlocal-enabled: false
+  sm-type: frontend
+workload-cluster-sm4:
+  worker-replicas: 1
+  worker-replicas-max: 3
+  worker-autoscaler-enabled: true
+  name: sm4
+  ingress-fqdn: '*.sm4.winterfell.live'
+  prometheus-fqdn: prometheus.sm4.winterfell.live # Leave this blank if you choose not to expose prometheus
+  grafana-fqdn: grafana.sm4.winterfell.live
+  controlplane-endpoint: 192.168.7.182 # only required for vsphere iaas, must belog to avi-management-cluster-vip-network-cidr
+  kubernetes-version: v1.20.8---vmware.1-tkg.2 # To Explicitly set a kubernetes version use`tanzu kubernetes-release get` and choose the appropriate value from the name column
+  antrea-nodeportlocal-enabled: false
+  sm-type: backend
 okta:
   auth-server-fqdn: dev-677945.okta.com
   tkg-app-client-id: REDACTED
@@ -130,3 +179,39 @@ dockerhub:
   username: REDACTED # Your dockerhub username
   password: REDACTED # Your dockerhub password
   email: REDACTED # Your dockerhub email
+gitlab:
+  namespace: gitlab
+  tmc-workspace: gitlab-workspace
+azdevops:
+  pat-token: pat-token
+  url: "https://dev.azure.com/xyz"
+tbs:
+  source-url-version: registry.sourceregistry.com/build-service/bundle:1.3.4
+  harbor-path: harbor.dorn.winterfell.live/tbs/tbs
+  harbor-path-and-version: harbor.dorn.winterfell.live/tbs/tbs:1.3.4
+  harbor-user: admin
+  harbor-pass: VMware1!
+tanzu-net:
+  user: asd@xyz.com
+  tanzunet-pass: password
+tanzu-data-services:
+  postgres:
+    chart: registry.sourceregistry.com/tanzu-sql-postgres/postgres-operator-chart:v1.4.0
+    operator-tanzu-img: registry.sourceregistry.com/tanzu-sql-postgres/postgres-operator:v1.4.0
+    instance-tanzu-img: registry.sourceregistry.com/tanzu-sql-postgres/postgres-instance:v1.4.0
+    operator-internal-img: harbor.dorn.winterfell.live/tanzu-sql-postgres/postgres-operator
+    instance-internal-img: harbor.dorn.winterfell.live/tanzu-sql-postgres/postgres-instance
+  mysql:
+    chart: registry.sourceregistry.com/tanzu-mysql-for-kubernetes/tanzu-mysql-operator-chart:1.2.0
+    operator-tanzu-img: registry.sourceregistry.com/tanzu-mysql-for-kubernetes/tanzu-mysql-operator:1.2.0
+    instance-tanzu-img: registry.sourceregistry.com/tanzu-mysql-for-kubernetes/tanzu-mysql-instance:1.2.0
+    operator-internal-img: harbor.dorn.winterfell.live/tanzu-sql-mysql/tanzu-mysql-operator
+    instance-internal-img: harbor.dorn.winterfell.live/tanzu-sql-mysql/tanzu-mysql-instance
+    harbor-path: harbor.dorn.winterfell.live/tanzu-sql-mysql/
+    harbor-secret-name: harbor-registry-credentials
+    version: 1.2.0
+  rabbitmq:
+    bundle: registry.sourceregistry.com/p-rabbitmq-for-kubernetes/tanzu-rabbitmq-package-repo:1.2.0
+    harbor-path: harbor.dorn.winterfell.live/tanzu-rabbitmq/tanzu-rabbitmq-package-repo
+    version: 1.2.0
+    sa-name: rbmq-tanzu
