@@ -1,11 +1,12 @@
 
 #Install-Module -Name VMware.WorkloadManagement
 #Find-Module "VMware.PowerCLI" | Install-Module -Scope "CurrentUser" -AllowClobber
-#Import-Module VMware.PowerCLI
-#Import-Module VMware.WorkloadManagement
+Import-Module VMware.PowerCLI
+Import-Module VMware.WorkloadManagement
 $vc="vcsa-01.haas-509.pez.vmware.com"
 $vc_user="administrator@vsphere.local"
 $vc_password="pass"
+$avi_password="pass"
 Connect-VIServer -User $vc_user -Password $vc_password -Server $vc
 $VMCluster = Get-Cluster  -Name "Cluster"
 
@@ -13,7 +14,7 @@ $VMCluster = Get-Cluster  -Name "Cluster"
 $vSphereWithTanzuParams = @{
     TanzuvCenterServer = "vcsa-01.haas-509.pez.vmware.com";
     TanzuvCenterServerUsername = "administrator@vsphere.local";
-    TanzuvCenterServerPassword = "pass";
+    TanzuvCenterServerPassword = $vc_password;
     ClusterName = "Cluster";
     TanzuContentLibrary = "Kubernetes";
     ControlPlaneSize = "TINY";
@@ -36,6 +37,6 @@ $vSphereWithTanzuParams = @{
     NSXALBPort = "443";
     NSXALBCertName = "avi"
     NSXALBUsername = "admin";
-    NSXALBPassword = "pass";
+    NSXALBPassword = $avi_password;
 }
 New-WorkloadManagement3 @vSphereWithTanzuParams 
