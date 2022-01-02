@@ -1,0 +1,1616 @@
+---
+# Source: tanzu-observability-demo/templates/00_app-namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tanzu-observability-demo
+---
+# Source: tanzu-observability-demo/templates/05_wavefront-secret.yaml
+apiVersion: v1
+data:
+  token: CHANGEMEWFTOKENBASE64
+kind: Secret
+metadata:
+  name: wf-token
+  namespace: tanzu-observability-demo
+type: Opaque
+---
+# Source: tanzu-observability-demo/templates/01_app-config-blue.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config-blue
+  namespace: tanzu-observability-demo
+data:
+  delivery-app-tags.yaml: |
+    application: tacocat-demo-tanzu-observability-demo
+    cluster: essos
+    service: delivery
+    shard: blue
+    customTags:
+      location: homelab
+      env: dev
+
+  delivery-app.yml: |
+    server:
+      port: 50054
+    
+    notificationHost: notification
+    notificationPort: 50056
+    
+    applicationTagsYamlFile: "/conf/delivery-app-tags.yaml"
+    wfReportingConfigYamlFile: "/conf/wf-config.yaml"
+
+  inventory.conf: |
+    {
+    	"application": "tacocat-demo-tanzu-observability-demo",
+    	"service":     "inventory",
+    	"cluster":     "essos",
+    	"shard":       "blue",	
+    
+    	"inventoryHost": "0.0.0.0:60001",
+    	"warehouseHost": "warehouse:50060",
+    
+    	"proxyHost":              "tanzu-observability-demo-wavefront-proxy",
+    	"proxyPort":              2878,
+    	"proxyDistributionsPort": 40000,
+    	"proxyTracingPort":       30000,
+    
+    	"simFailCheckout":  0.02,
+    	"simFailAvailable": 0.03,
+    	"simDelayChance":   0.3333,
+    	"simDelayMS":       1000,
+    	"simDelayCpuPct":   0.4
+    }
+
+  notification-app-tags.yaml: |
+    application: tacocat-demo-tanzu-observability-demo
+    cluster: essos
+    service: notification
+    shard: blue
+    customTags:
+      location: homelab
+      env: dev
+
+  notification-app.yml: |
+    server:
+      port: 50056
+    
+    cxf:
+      path: /
+      jaxrs:
+        component-scan: true
+    
+    applicationTagsYamlFile: "/conf/notification-app-tags.yaml"
+    wfReportingConfigYamlFile: "/conf/wf-config.yaml"
+
+
+  packaging-app-tags.yaml: |
+    application: tacocat-demo-tanzu-observability-demo
+    cluster: essos
+    service: packaging
+    shard: blue
+    customTags:
+      location: homelab
+      env: dev
+
+  packaging-app.yaml: |
+    grpcPort: 50053
+    applicationTagsYamlFile: "/conf/packaging-app-tags.yaml"
+    wfReportingConfigYamlFile: "/conf/wf-config.yaml"
+
+  payments-app-tags.yaml: |
+    application: tacocat-demo-tanzu-observability-demo
+    cluster: essos
+    service: payments
+    shard: blue
+    customTags:
+      location: homelab
+      env: dev
+
+
+  payments-app.yaml: |
+    port: 50063
+    applicationTagsYamlFile: "/conf/payments-app-tags.yaml"
+    wfReportingConfigYamlFile: "/conf/wf-config.yaml"
+
+
+  printing-app-tags.yaml: |
+    application: tacocat-demo-tanzu-observability-demo
+    cluster: essos
+    service: printing
+    shard: blue
+    customTags:
+      location: homelab
+      env: dev
+
+
+  printing-app.yaml: |
+    grpcPort: 50052
+    applicationTagsYamlFile: "/conf/printing-app-tags.yaml"
+    wfReportingConfigYamlFile: "/conf/wf-config.yaml"
+
+  shopping-app-tags.yaml: |
+    application: tacocat-demo-tanzu-observability-demo
+    cluster: essos
+    service: shopping
+    shard: blue
+    customTags:
+      location: homelab
+      env: dev
+
+  shopping-app.yaml: |
+    server:
+      applicationConnectors:
+      - type: http
+        port: 50050
+      adminConnectors:
+      - type: http
+        port: 50150
+    
+    inventoryPort: 60001
+    paymentsPort: 50063
+    stylingPort: 50051
+    deliveryPort: 50054
+    
+    inventoryHost: "inventory"
+    paymentsHost: "payments"
+    stylingHost: "styling"
+    deliveryHost: "delivery"
+    
+    applicationTagsYamlFile: "/conf/shopping-app-tags.yaml"
+    wfReportingConfigYamlFile: "/conf/wf-config.yaml"
+
+  shop-ui-app-tags.yaml: |
+    application: tacocat-demo-tanzu-observability-demo
+    cluster: to-cp-demo-cluster-12
+    service: shop-ui
+    shard: blue
+    customTags:
+      location: eks
+      env: dev
+    server:
+      applicationConnectors:
+      - type: http
+      port: 8080
+
+  styling-app-tags.yaml: |
+    application: tacocat-demo-tanzu-observability-demo
+    cluster: essos
+    service: styling
+    shard: blue
+    customTags:
+      location: homelab
+      env: dev
+
+  styling-app.yaml: |
+    server:
+      applicationConnectors:
+      - type: http
+        port: 50051
+      adminConnectors:
+      - type: http
+        port: 50151
+    
+    inventoryPort: 60001
+    printingPort: 50052
+    packagingPort: 50053
+    shoppingPort: 50050
+    
+    inventoryHost: "inventory"
+    printingHost: "printing"
+    packagingHost: "packaging"
+    shoppingHost: "shopping"
+    
+    applicationTagsYamlFile: "/conf/styling-app-tags.yaml"
+    wfReportingConfigYamlFile: "/conf/wf-config.yaml"
+
+  warehouse-app-tags.yaml: |
+    application: tacocat-demo-tanzu-observability-demo
+    cluster: essos
+    service: warehouse
+    shard: blue
+    customTags:
+      location: homelab
+      env: dev
+
+
+  wf-config.yaml: |
+    reportingMechanism: proxy
+    proxyHost: tanzu-observability-demo-wavefront-proxy
+    proxyMetricsPort: 2878
+    proxyDistributionsPort: 2878
+    proxyTracingPort: 30000
+    
+    reportTraces: true
+---
+# Source: tanzu-observability-demo/templates/01_app-config-green.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config-green
+  namespace: tanzu-observability-demo
+data:
+  delivery-app-tags.yaml: |
+    application: tacocat-demo-tanzu-observability-demo
+    cluster: essos
+    service: delivery
+    shard: green
+    customTags:
+      location: homelab
+      env: dev
+
+  delivery-app.yml: |
+    server:
+      port: 50054
+    
+    notificationHost: notification
+    notificationPort: 50056
+    
+    applicationTagsYamlFile: "/conf/delivery-app-tags.yaml"
+    wfReportingConfigYamlFile: "/conf/wf-config.yaml"
+
+  inventory.conf: |
+    {
+    	"application": "tacocat-demo-tanzu-observability-demo",
+    	"service":     "inventory",
+    	"cluster":     "essos",
+    	"shard":       "green",	
+    
+    	"inventoryHost": "0.0.0.0:60001",
+    	"warehouseHost": "warehouse:50060",
+    
+    	"proxyHost":              "tanzu-observability-demo-wavefront-proxy",
+    	"proxyPort":              2878,
+    	"proxyDistributionsPort": 40000,
+    	"proxyTracingPort":       30000,
+    
+    	"simFailCheckout":  0.02,
+    	"simFailAvailable": 0.03,
+    	"simDelayChance":   0.3333,
+    	"simDelayMS":       1000,
+    	"simDelayCpuPct":   0.4
+    }
+
+  notification-app-tags.yaml: |
+    application: tacocat-demo-tanzu-observability-demo
+    cluster: essos
+    service: notification
+    shard: green
+    customTags:
+      location: homelab
+      env: dev
+
+  notification-app.yml: |
+    server:
+      port: 50056
+    
+    cxf:
+      path: /
+      jaxrs:
+        component-scan: true
+    
+    applicationTagsYamlFile: "/conf/notification-app-tags.yaml"
+    wfReportingConfigYamlFile: "/conf/wf-config.yaml"
+
+
+  packaging-app-tags.yaml: |
+    application: tacocat-demo-tanzu-observability-demo
+    cluster: essos
+    service: packaging
+    shard: green
+    customTags:
+      location: homelab
+      env: dev
+
+  packaging-app.yaml: |
+    grpcPort: 50053
+    applicationTagsYamlFile: "/conf/packaging-app-tags.yaml"
+    wfReportingConfigYamlFile: "/conf/wf-config.yaml"
+
+  payments-app-tags.yaml: |
+    application: tacocat-demo-tanzu-observability-demo
+    cluster: essos
+    service: payments
+    shard: green
+    customTags:
+      location: homelab
+      env: dev
+
+
+  payments-app.yaml: |
+    port: 50063
+    applicationTagsYamlFile: "/conf/payments-app-tags.yaml"
+    wfReportingConfigYamlFile: "/conf/wf-config.yaml"
+
+
+  printing-app-tags.yaml: |
+    application: tacocat-demo-tanzu-observability-demo
+    cluster: essos
+    service: printing
+    shard: green
+    customTags:
+      location: homelab
+      env: dev
+
+
+  printing-app.yaml: |
+    grpcPort: 50052
+    applicationTagsYamlFile: "/conf/printing-app-tags.yaml"
+    wfReportingConfigYamlFile: "/conf/wf-config.yaml"
+
+  shopping-app-tags.yaml: |
+    application: tacocat-demo-tanzu-observability-demo
+    cluster: essos
+    service: shopping
+    shard: green
+    customTags:
+      location: homelab
+      env: dev
+
+  shopping-app.yaml: |
+    server:
+      applicationConnectors:
+      - type: http
+        port: 50050
+      adminConnectors:
+      - type: http
+        port: 50150
+    
+    inventoryPort: 60001
+    paymentsPort: 50063
+    stylingPort: 50051
+    deliveryPort: 50054
+    
+    inventoryHost: "inventory"
+    paymentsHost: "payments"
+    stylingHost: "styling"
+    deliveryHost: "delivery"
+    
+    applicationTagsYamlFile: "/conf/shopping-app-tags.yaml"
+    wfReportingConfigYamlFile: "/conf/wf-config.yaml"
+
+  shop-ui-app-tags.yaml: |
+    application: tacocat-demo-tanzu-observability-demo
+    cluster: to-cp-demo-cluster-12
+    service: shop-ui
+    shard: green
+    customTags:
+      location: eks
+      env: dev
+    server:
+      applicationConnectors:
+      - type: http
+      port: 8080
+
+  styling-app-tags.yaml: |
+    application: tacocat-demo-tanzu-observability-demo
+    cluster: essos
+    service: styling
+    shard: green
+    customTags:
+      location: homelab
+      env: dev
+
+  styling-app.yaml: |
+    server:
+      applicationConnectors:
+      - type: http
+        port: 50051
+      adminConnectors:
+      - type: http
+        port: 50151
+    
+    inventoryPort: 60001
+    printingPort: 50052
+    packagingPort: 50053
+    shoppingPort: 50050
+    
+    inventoryHost: "inventory"
+    printingHost: "printing"
+    packagingHost: "packaging"
+    shoppingHost: "shopping"
+    
+    applicationTagsYamlFile: "/conf/styling-app-tags.yaml"
+    wfReportingConfigYamlFile: "/conf/wf-config.yaml"
+
+  warehouse-app-tags.yaml: |
+    application: tacocat-demo-tanzu-observability-demo
+    cluster: essos
+    service: warehouse
+    shard: green
+    customTags:
+      location: homelab
+      env: dev
+
+
+  wf-config.yaml: |
+    reportingMechanism: proxy
+    proxyHost: tanzu-observability-demo-wavefront-proxy
+    proxyMetricsPort: 2878
+    proxyDistributionsPort: 2878
+    proxyTracingPort: 30000
+    
+    reportTraces: true
+---
+# Source: tanzu-observability-demo/templates/10_wavefront.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: tanzu-observability-demo-wavefront-proxy
+  namespace: tanzu-observability-demo
+  labels:
+    app: tacocat-demo-tanzu-observability-demo
+    service: tanzu-observability-demo-wavefront-proxy
+spec:
+  ports:
+  - name: wavefront
+    port: 2878
+    protocol: TCP
+  - name: http
+    port: 30000
+    targetPort: 30000
+    protocol: TCP
+  selector:
+    app: tacocat-demo-tanzu-observability-demo
+    service: tanzu-observability-demo-wavefront-proxy
+---
+# Source: tanzu-observability-demo/templates/19_shopping-service.yml
+apiVersion: v1
+kind: Service
+metadata:
+  name: shopping
+  namespace: tanzu-observability-demo
+spec: 
+  selector:
+    app: tacocat-demo-tanzu-observability-demo
+    service: shopping
+  type: LoadBalancer
+  ports:
+  - name: application
+    port: 50050
+  - name: admin
+    port: 50150
+---
+# Source: tanzu-observability-demo/templates/22_styling.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: styling
+  namespace: tanzu-observability-demo
+spec: 
+  selector:
+    app: tacocat-demo-tanzu-observability-demo
+    service: styling  
+  type: ClusterIP
+  ports:
+  - name: application
+    port: 50051
+  - name: admin
+    port: 50151
+---
+# Source: tanzu-observability-demo/templates/23_printing.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: printing
+  namespace: tanzu-observability-demo
+spec: 
+  selector:
+    app: tacocat-demo-tanzu-observability-demo
+    service: printing
+  type: ClusterIP
+  ports:
+  - name: application
+    port: 50052
+---
+# Source: tanzu-observability-demo/templates/24_packaging.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: packaging
+  namespace: tanzu-observability-demo
+spec: 
+  selector:
+    app: tacocat-demo-tanzu-observability-demo
+    service: packaging
+  type: ClusterIP
+  ports:
+  - name: application
+    port: 50053
+---
+# Source: tanzu-observability-demo/templates/31_delivery.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: delivery
+  namespace: tanzu-observability-demo
+spec: 
+  selector:
+    app: tacocat-demo-tanzu-observability-demo
+    service: delivery  
+  type: ClusterIP
+  ports:
+  - name: application
+    port: 50054
+---
+# Source: tanzu-observability-demo/templates/32_notification.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: notification
+  namespace: tanzu-observability-demo
+spec: 
+  selector:
+    app: tacocat-demo-tanzu-observability-demo
+    service: notification  
+  type: ClusterIP
+  ports:
+  - name: application
+    port: 50056
+---
+# Source: tanzu-observability-demo/templates/41_payments.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: payments
+  namespace: tanzu-observability-demo
+spec: 
+  selector:
+    app: tacocat-demo-tanzu-observability-demo
+    service: payments
+  type: ClusterIP
+  ports:
+  - name: application
+    port: 50063
+---
+# Source: tanzu-observability-demo/templates/51_inventory.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory
+  namespace: tanzu-observability-demo
+spec: 
+  selector:
+    app: tacocat-demo-tanzu-observability-demo
+    service: inventory  
+  type: ClusterIP
+  ports:
+  - name: application
+    port: 60001
+---
+# Source: tanzu-observability-demo/templates/61_warehouse.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: warehouse
+  namespace: tanzu-observability-demo
+spec: 
+  selector:
+    app: tacocat-demo-tanzu-observability-demo
+    service: warehouse
+  type: ClusterIP
+  ports:
+  - name: application
+    port: 50060
+---
+# Source: tanzu-observability-demo/templates/10_wavefront.yaml
+# Need to change YOUR_CLUSTER and YOUR_API_TOKEN accordingly
+
+apiVersion: apps/v1
+# Kubernetes versions after 1.9.0 should use apps/v1
+# Kubernetes version 1.8.x should use apps/v1beta2
+# Kubernetes versions before 1.8.0 should use apps/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: tacocat-demo-tanzu-observability-demo
+    service: tanzu-observability-demo-wavefront-proxy
+  name: tanzu-observability-demo-wavefront-proxy
+  namespace: tanzu-observability-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tacocat-demo-tanzu-observability-demo
+      service: tanzu-observability-demo-wavefront-proxy
+  template:
+    metadata:
+      labels:
+        app: tacocat-demo-tanzu-observability-demo
+        service: tanzu-observability-demo-wavefront-proxy
+    spec:
+      containers:
+      - name: tanzu-observability-demo-wavefront-proxy
+        image: projects.registry.vmware.com/tanzu_observability/proxy:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: WAVEFRONT_URL
+          value: https://vmware.wavefront.com
+        - name: WAVEFRONT_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: wf-token
+              key: token
+        # Uncomment the below lines to consume Zipkin/Istio traces
+        - name: WAVEFRONT_PROXY_ARGS
+          value: --traceListenerPorts 30000
+        ports:
+        - containerPort: 2878
+          protocol: TCP
+        # Uncomment the below lines to consume traces
+        - containerPort: 30000
+          protocol: TCP
+        securityContext:
+          privileged: false
+---
+# Source: tanzu-observability-demo/templates/21_shopping.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tacocat-demo-tanzu-observability-demo
+    service: shopping
+    shard: blue
+  name: shopping-blue
+  namespace: tanzu-observability-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tacocat-demo-tanzu-observability-demo
+      service: shopping
+      shard: blue
+  template:
+    metadata:
+      labels:
+        app: tacocat-demo-tanzu-observability-demo
+        service: shopping
+        shard: blue
+    spec:
+      containers:
+      - name: shopping
+        image: public.ecr.aws/tanzu_observability_demo_app/to-demo/shopping:latest
+        imagePullPolicy: Always
+        command:
+        - "java"
+        - "-jar"
+        - "/shopping.jar"
+        - "server"
+        - "/conf/shopping-app.yaml"
+        ports:
+        - containerPort: 50050
+          name: application
+          protocol: TCP
+        - containerPort: 50150
+          name: admin
+          protocol: TCP
+        volumeMounts:
+        - name: conf
+          mountPath: /conf
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            memory: 350Mi
+      volumes:
+      - name: conf
+        configMap:
+          name: app-config-blue
+          defaultMode: 0744
+---
+# Source: tanzu-observability-demo/templates/21_shopping.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tacocat-demo-tanzu-observability-demo
+    service: shopping
+    shard: green
+  name: shopping-green
+  namespace: tanzu-observability-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tacocat-demo-tanzu-observability-demo
+      service: shopping
+      shard: green
+  template:
+    metadata:
+      labels:
+        app: tacocat-demo-tanzu-observability-demo
+        service: shopping
+        shard: green
+    spec:
+      containers:
+        - name: shopping
+          image: public.ecr.aws/tanzu_observability_demo_app/to-demo/shopping:latest
+          imagePullPolicy: Always
+          command:
+            - "java"
+            - "-jar"
+            - "/shopping.jar"
+            - "server"
+            - "/conf/shopping-app.yaml"
+          ports:
+            - containerPort: 50050
+              name: application
+              protocol: TCP
+            - containerPort: 50150
+              name: admin
+              protocol: TCP
+          volumeMounts:
+            - name: conf
+              mountPath: /conf
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              memory: 350Mi
+      volumes:
+        - name: conf
+          configMap:
+            name: app-config-green
+            defaultMode: 0744
+---
+# Source: tanzu-observability-demo/templates/22_styling.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tacocat-demo-tanzu-observability-demo
+    service: styling
+    shard: blue
+  name: styling-blue
+  namespace: tanzu-observability-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tacocat-demo-tanzu-observability-demo
+      service: styling
+      shard: blue
+  template:
+    metadata:
+      labels:
+        app: tacocat-demo-tanzu-observability-demo
+        service: styling
+        shard: blue
+    spec:
+      containers:
+      - name: styling
+        image: public.ecr.aws/tanzu_observability_demo_app/to-demo/styling:latest
+        imagePullPolicy: Always
+        command:
+        - "java"
+        - "-jar"
+        - "/styling.jar"
+        - "server"
+        - "/conf/styling-app.yaml"
+        ports:
+        - containerPort: 50051
+          name: application
+          protocol: TCP
+        - containerPort: 50151
+          name: admin
+          protocol: TCP
+        volumeMounts:
+        - name: conf
+          mountPath: /conf
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            memory: 350Mi
+      volumes:
+      - name: conf
+        configMap:
+          name: app-config-blue
+          defaultMode: 0744
+---
+# Source: tanzu-observability-demo/templates/22_styling.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tacocat-demo-tanzu-observability-demo
+    service: styling
+    shard: green
+  name: styling-green
+  namespace: tanzu-observability-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tacocat-demo-tanzu-observability-demo
+      service: styling
+      shard: green
+  template:
+    metadata:
+      labels:
+        app: tacocat-demo-tanzu-observability-demo
+        service: styling
+        shard: green
+    spec:
+      containers:
+        - name: styling
+          image: public.ecr.aws/tanzu_observability_demo_app/to-demo/styling:latest
+          imagePullPolicy: Always
+          command:
+            - "java"
+            - "-jar"
+            - "/styling.jar"
+            - "server"
+            - "/conf/styling-app.yaml"
+          ports:
+            - containerPort: 50051
+              name: application
+              protocol: TCP
+            - containerPort: 50151
+              name: admin
+              protocol: TCP
+          volumeMounts:
+            - name: conf
+              mountPath: /conf
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              memory: 350Mi
+      volumes:
+        - name: conf
+          configMap:
+            name: app-config-green
+            defaultMode: 0744
+---
+# Source: tanzu-observability-demo/templates/23_printing.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tacocat-demo-tanzu-observability-demo
+    service: printing
+    shard: blue
+  name: printing-blue
+  namespace: tanzu-observability-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tacocat-demo-tanzu-observability-demo
+      service: printing
+      shard: blue
+  template:
+    metadata:
+      labels:
+        app: tacocat-demo-tanzu-observability-demo
+        service: printing
+        shard: blue
+    spec:
+      containers:
+      - name: printing
+        image: public.ecr.aws/tanzu_observability_demo_app/to-demo/printing:latest
+        imagePullPolicy: Always
+        command:
+        - "java"
+        - "-jar"
+        - "/printing.jar"
+        - "/conf/printing-app.yaml"
+        ports:
+        - containerPort: 50052
+          name: application
+          protocol: TCP
+        volumeMounts:
+        - name: conf
+          mountPath: /conf
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            memory: 350Mi
+      volumes:
+      - name: conf
+        configMap:
+          name: app-config-blue
+          defaultMode: 0744
+---
+# Source: tanzu-observability-demo/templates/23_printing.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tacocat-demo-tanzu-observability-demo
+    service: printing
+    shard: green
+  name: printing-green
+  namespace: tanzu-observability-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tacocat-demo-tanzu-observability-demo
+      service: printing
+      shard: green
+  template:
+    metadata:
+      labels:
+        app: tacocat-demo-tanzu-observability-demo
+        service: printing
+        shard: green
+    spec:
+      containers:
+        - name: printing
+          image: public.ecr.aws/tanzu_observability_demo_app/to-demo/printing:latest
+          imagePullPolicy: Always
+          command:
+            - "java"
+            - "-jar"
+            - "/printing.jar"
+            - "/conf/printing-app.yaml"
+          ports:
+            - containerPort: 50052
+              name: application
+              protocol: TCP
+          volumeMounts:
+            - name: conf
+              mountPath: /conf
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              memory: 350Mi
+      volumes:
+        - name: conf
+          configMap:
+            name: app-config-green
+            defaultMode: 0744
+---
+# Source: tanzu-observability-demo/templates/24_packaging.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tacocat-demo-tanzu-observability-demo
+    service: packaging
+    shard: blue
+  name: packaging-blue
+  namespace: tanzu-observability-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tacocat-demo-tanzu-observability-demo
+      service: packaging
+      shard: blue
+  template:
+    metadata:
+      labels:
+        app: tacocat-demo-tanzu-observability-demo
+        service: packaging
+        shard: blue
+    spec:
+      containers:
+      - name: packaging
+        image: public.ecr.aws/tanzu_observability_demo_app/to-demo/packaging:latest
+        imagePullPolicy: Always
+        command:
+        - "java"
+        - "-jar"
+        - "/packaging.jar"
+        - "/conf/packaging-app.yaml"
+        ports:
+        - containerPort: 50053
+          name: application
+          protocol: TCP
+        volumeMounts:
+        - name: conf
+          mountPath: /conf
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            memory: 350Mi
+      volumes:
+      - name: conf
+        configMap:
+          name: app-config-blue
+          defaultMode: 0744
+---
+# Source: tanzu-observability-demo/templates/24_packaging.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tacocat-demo-tanzu-observability-demo
+    service: packaging
+    shard: green
+  name: packaging-green
+  namespace: tanzu-observability-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tacocat-demo-tanzu-observability-demo
+      service: packaging
+      shard: green
+  template:
+    metadata:
+      labels:
+        app: tacocat-demo-tanzu-observability-demo
+        service: packaging
+        shard: green
+    spec:
+      containers:
+        - name: packaging
+          image: public.ecr.aws/tanzu_observability_demo_app/to-demo/packaging:latest
+          imagePullPolicy: Always
+          command:
+            - "java"
+            - "-jar"
+            - "/packaging.jar"
+            - "/conf/packaging-app.yaml"
+          ports:
+            - containerPort: 50053
+              name: application
+              protocol: TCP
+          volumeMounts:
+            - name: conf
+              mountPath: /conf
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              memory: 350Mi
+      volumes:
+        - name: conf
+          configMap:
+            name: app-config-green
+            defaultMode: 0744
+---
+# Source: tanzu-observability-demo/templates/31_delivery.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tacocat-demo-tanzu-observability-demo
+    service: delivery
+    shard: blue
+  name: delivery-blue
+  namespace: tanzu-observability-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tacocat-demo-tanzu-observability-demo
+      service: delivery
+      shard: blue
+  template:
+    metadata:
+      labels:
+        app: tacocat-demo-tanzu-observability-demo
+        service: delivery
+        shard: blue
+    spec:
+      containers:
+      - name: delivery
+        image: public.ecr.aws/tanzu_observability_demo_app/to-demo/delivery:latest
+        imagePullPolicy: Always
+        command:
+        - "java"
+        - "-jar"
+        - "/delivery.jar"
+        - "--spring.config.location=/conf/delivery-app.yml"
+        ports:
+        - containerPort: 50054
+          name: application
+          protocol: TCP
+        volumeMounts:
+        - name: conf
+          mountPath: /conf
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            memory: 350Mi
+      volumes:
+      - name: conf
+        configMap:
+          name: app-config-blue
+          defaultMode: 0744
+---
+# Source: tanzu-observability-demo/templates/31_delivery.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tacocat-demo-tanzu-observability-demo
+    service: delivery
+    shard: green
+  name: delivery-green
+  namespace: tanzu-observability-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tacocat-demo-tanzu-observability-demo
+      service: delivery
+      shard: green
+  template:
+    metadata:
+      labels:
+        app: tacocat-demo-tanzu-observability-demo
+        service: delivery
+        shard: green
+    spec:
+      containers:
+        - name: delivery
+          image: public.ecr.aws/tanzu_observability_demo_app/to-demo/delivery:latest
+          imagePullPolicy: Always
+          command:
+            - "java"
+            - "-jar"
+            - "/delivery.jar"
+            - "--spring.config.location=/conf/delivery-app.yml"
+          ports:
+            - containerPort: 50054
+              name: application
+              protocol: TCP
+          volumeMounts:
+            - name: conf
+              mountPath: /conf
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              memory: 350Mi
+      volumes:
+        - name: conf
+          configMap:
+            name: app-config-green
+            defaultMode: 0744
+---
+# Source: tanzu-observability-demo/templates/32_notification.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tacocat-demo-tanzu-observability-demo
+    service: notification
+    shard: blue
+  name: notification-blue
+  namespace: tanzu-observability-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tacocat-demo-tanzu-observability-demo
+      service: notification
+      shard: blue
+  template:
+    metadata:
+      labels:
+        app: tacocat-demo-tanzu-observability-demo
+        service: notification
+        shard: blue
+    spec:
+      containers:
+      - name: notification
+        image: public.ecr.aws/tanzu_observability_demo_app/to-demo/notification:latest
+        imagePullPolicy: Always 
+        command:
+        - "java"
+        - "-jar"
+        - "/notification.jar"
+        - "--spring.config.location=/conf/notification-app.yml"
+        ports:
+        - containerPort: 50056
+          name: application
+          protocol: TCP
+        volumeMounts:
+        - name: conf
+          mountPath: /conf
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            memory: 350Mi
+      volumes:
+      - name: conf
+        configMap:
+          name: app-config-blue
+          defaultMode: 0744
+---
+# Source: tanzu-observability-demo/templates/32_notification.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tacocat-demo-tanzu-observability-demo
+    service: notification
+    shard: green
+  name: notification-green
+  namespace: tanzu-observability-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tacocat-demo-tanzu-observability-demo
+      service: notification
+      shard: green
+  template:
+    metadata:
+      labels:
+        app: tacocat-demo-tanzu-observability-demo
+        service: notification
+        shard: green
+    spec:
+      containers:
+        - name: notification
+          image: public.ecr.aws/tanzu_observability_demo_app/to-demo/notification:latest
+          imagePullPolicy: Always
+          command:
+            - "java"
+            - "-jar"
+            - "/notification.jar"
+            - "--spring.config.location=/conf/notification-app.yml"
+          ports:
+            - containerPort: 50056
+              name: application
+              protocol: TCP
+          volumeMounts:
+            - name: conf
+              mountPath: /conf
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              memory: 350Mi
+      volumes:
+        - name: conf
+          configMap:
+            name: app-config-green
+            defaultMode: 0744
+---
+# Source: tanzu-observability-demo/templates/41_payments.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tacocat-demo-tanzu-observability-demo
+    service: payments
+    shard: blue
+  name: payments-blue
+  namespace: tanzu-observability-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tacocat-demo-tanzu-observability-demo
+      service: payments
+      shard: blue
+  template:
+    metadata:
+      labels:
+        app: tacocat-demo-tanzu-observability-demo
+        service: payments
+        shard: blue
+    spec:
+      containers:
+      - name: payments
+        image: public.ecr.aws/tanzu_observability_demo_app/to-demo/payments:latest
+        imagePullPolicy: Always
+        command:
+        - "dotnet"
+        - "run"
+        - "-p"
+        - "/payments/src/Payments/"
+        ports:
+        - containerPort: 50063
+          name: application
+          protocol: TCP
+        volumeMounts:
+        - name: conf
+          mountPath: /conf
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            memory: 350Mi
+      volumes:
+      - name: conf
+        configMap:
+          name: app-config-blue
+          defaultMode: 0744
+---
+# Source: tanzu-observability-demo/templates/41_payments.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tacocat-demo-tanzu-observability-demo
+    service: payments
+    shard: green
+  name: payments-green
+  namespace: tanzu-observability-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tacocat-demo-tanzu-observability-demo
+      service: payments
+      shard: green
+  template:
+    metadata:
+      labels:
+        app: tacocat-demo-tanzu-observability-demo
+        service: payments
+        shard: green
+    spec:
+      containers:
+        - name: payments
+          image: public.ecr.aws/tanzu_observability_demo_app/to-demo/payments:latest
+          imagePullPolicy: Always
+          command:
+            - "dotnet"
+            - "run"
+            - "-p"
+            - "/payments/src/Payments/"
+          ports:
+            - containerPort: 50063
+              name: application
+              protocol: TCP
+          volumeMounts:
+            - name: conf
+              mountPath: /conf
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              memory: 350Mi
+      volumes:
+        - name: conf
+          configMap:
+            name: app-config-green
+            defaultMode: 0744
+---
+# Source: tanzu-observability-demo/templates/51_inventory.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tacocat-demo-tanzu-observability-demo
+    service: inventory
+    shard: blue
+  name: inventory-blue
+  namespace: tanzu-observability-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tacocat-demo-tanzu-observability-demo
+      service: inventory
+      shard: blue
+  template:
+    metadata:
+      labels:
+        app: tacocat-demo-tanzu-observability-demo
+        service: inventory
+        shard: blue
+    spec:
+      containers:
+      - name: inventory
+        image: public.ecr.aws/tanzu_observability_demo_app/to-demo/inventory:latest
+        imagePullPolicy: Always
+        command:
+        - "/inventory"
+        - "/conf/inventory.conf"
+        ports:
+        - containerPort: 60001
+          name: application
+          protocol: TCP
+        volumeMounts:
+        - name: conf
+          mountPath: /conf
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            memory: 350Mi
+      volumes:
+      - name: conf
+        configMap:
+          name: app-config-blue
+          defaultMode: 0744
+---
+# Source: tanzu-observability-demo/templates/51_inventory.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tacocat-demo-tanzu-observability-demo
+    service: inventory
+    shard: green
+  name: inventory-green
+  namespace: tanzu-observability-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tacocat-demo-tanzu-observability-demo
+      service: inventory
+      shard: green
+  template:
+    metadata:
+      labels:
+        app: tacocat-demo-tanzu-observability-demo
+        service: inventory
+        shard: green
+    spec:
+      containers:
+        - name: inventory
+          image: public.ecr.aws/tanzu_observability_demo_app/to-demo/inventory:latest
+          imagePullPolicy: Always
+          command:
+            - "/inventory"
+            - "/conf/inventory.conf"
+          ports:
+            - containerPort: 60001
+              name: application
+              protocol: TCP
+          volumeMounts:
+            - name: conf
+              mountPath: /conf
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              memory: 350Mi
+      volumes:
+        - name: conf
+          configMap:
+            name: app-config-green
+            defaultMode: 0744
+---
+# Source: tanzu-observability-demo/templates/61_warehouse.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tacocat-demo-tanzu-observability-demo
+    service: warehouse
+    shard: blue
+  name: warehouse-blue
+  namespace: tanzu-observability-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tacocat-demo-tanzu-observability-demo
+      service: warehouse
+      shard: blue
+  template:
+    metadata:
+      labels:
+        app: tacocat-demo-tanzu-observability-demo
+        service: warehouse
+        shard: blue
+    spec:
+      containers:
+      - name: warehouse
+        image: public.ecr.aws/tanzu_observability_demo_app/to-demo/warehouse:latest
+        imagePullPolicy: Always
+        command:
+        - "python3"
+        - "manage.py"
+        - "runserver"
+        - "0.0.0.0:50060"
+        ports:
+        - containerPort: 50060
+          name: application
+          protocol: TCP
+        volumeMounts:
+        - name: conf
+          mountPath: /conf
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            memory: 350Mi
+      volumes:
+      - name: conf
+        configMap:
+          name: app-config-blue
+          defaultMode: 0744
+---
+# Source: tanzu-observability-demo/templates/61_warehouse.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tacocat-demo-tanzu-observability-demo
+    service: warehouse
+    shard: green
+  name: warehouse-green
+  namespace: tanzu-observability-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tacocat-demo-tanzu-observability-demo
+      service: warehouse
+      shard: green
+  template:
+    metadata:
+      labels:
+        app: tacocat-demo-tanzu-observability-demo
+        service: warehouse
+        shard: green
+    spec:
+      containers:
+        - name: warehouse
+          image: public.ecr.aws/tanzu_observability_demo_app/to-demo/warehouse:latest
+          imagePullPolicy: Always
+          command:
+            - "python3"
+            - "manage.py"
+            - "runserver"
+            - "0.0.0.0:50060"
+          ports:
+            - containerPort: 50060
+              name: application
+              protocol: TCP
+          volumeMounts:
+            - name: conf
+              mountPath: /conf
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              memory: 350Mi
+      volumes:
+        - name: conf
+          configMap:
+            name: app-config-green
+            defaultMode: 0744
+---
+# Source: tanzu-observability-demo/templates/90_loadgen.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tacocat-demo-tanzu-observability-demo
+    service: loadgen
+  name: loadgen
+  namespace: tanzu-observability-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tacocat-demo-tanzu-observability-demo
+      service: loadgen
+  template:
+    metadata:
+      labels:
+        app: tacocat-demo-tanzu-observability-demo
+        service: loadgen
+    spec:
+      containers:
+      - name: loadgen
+        image: public.ecr.aws/tanzu_observability_demo_app/to-demo/loadgen:latest
+        imagePullPolicy: Always
+        command:
+        - "java"
+        - "-jar"
+        - "/loadgen.jar"
+        - "shopping"
+        - "50050"
+        - "50051"
+        - "2"
+        - "15"
+        - "0"
+        resources:
+          limits:
+            memory: 256Mi
+          requests:
+            memory: 256Mi
