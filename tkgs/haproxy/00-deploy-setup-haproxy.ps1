@@ -46,3 +46,5 @@ $ovfConfig.NetworkMapping.Frontend.Value = ""                 #Not used in this 
 
 Import-VApp -Source $ovfpath -OvfConfiguration $ovfConfig -Name $VMName -VMHost $VMHost -Location $Cluster -Datastore $Datastore -DiskStorageFormat $DiskFormat -Confirm:$false
 Start-VM (Get-VM $VMname) 
+
+dig tanzu-haproxy-1.haas-421.pez.vmware.com
