@@ -17,3 +17,7 @@ IDENTITY_MANAGEMENT_TYPE: oidc
 
 pinniped.supervisor_svc_endpoint: url
 supervisor_svc_endpoint: url
+
+ENABLE_AUTOSCALER: #added by scripts
+AUTOSCALER_MIN_SIZE_0: #added by scripts
+AUTOSCALER_MAX_SIZE_0: #aded by scripts

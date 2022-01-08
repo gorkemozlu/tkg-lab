@@ -13,6 +13,21 @@ get_cluster_type () {
   if [ `yq e .workload-cluster.name $PARAMS_YAML` = $1 ]; then
     echo "workload-cluster"
   fi
+  if [ `yq e .workload-cluster-sm1.name $PARAMS_YAML` = $1 ]; then
+    echo "workload-cluster-sm1"
+  fi
+  if [ `yq e .workload-cluster-sm2.name $PARAMS_YAML` = $1 ]; then
+    echo "workload-cluster-sm2"
+  fi
+  if [ `yq e .workload-cluster-sm3.name $PARAMS_YAML` = $1 ]; then
+    echo "workload-cluster-sm3"
+  fi
+  if [ `yq e .workload-cluster-sm4.name $PARAMS_YAML` = $1 ]; then
+    echo "workload-cluster-sm4"
+  fi
+  if [ `yq e .workload-cluster-sm5.name $PARAMS_YAML` = $1 ]; then
+    echo "workload-cluster-sm5"
+  fi
 }
 
 IAAS=$(yq e .iaas $PARAMS_YAML)
@@ -46,7 +61,15 @@ then
   export AWS_CONTROL_PLANE_MACHINE_TYPE=$(yq e .aws.control-plane-machine-type $PARAMS_YAML)
   export AWS_NODE_MACHINE_TYPE=$(yq e .aws.node-machine-type $PARAMS_YAML)
   export supervisor_svc_endpoint=$(kubectl get svc pinniped-supervisor -n pinniped-supervisor -ojsonpath="{.status.loadBalancer.ingress[0].hostname}")
-  
+
+  CLUSTER_TYPE="$(get_cluster_type $CLUSTER)"
+
+  export AUTOSCALER_ENABLED=$(yq e '.'$CLUSTER_TYPE'.worker-autoscaler-enabled // false' $PARAMS_YAML)
+  if [ "$AUTOSCALER_ENABLED" = "true" ];
+  then
+    # Default to worker-replas value if no max has been set
+    export WORKER_AUTOSCALER_MAX_NODES=$(yq e '.'$CLUSTER_TYPE'.worker-replicas-max // .'$CLUSTER_TYPE'.worker-replicas' $PARAMS_YAML)
+  fi
 
   yq e -i '.AWS_VPC_ID = env(VPC_ID)' generated/$CLUSTER/cluster-config.yaml
   yq e -i '.AWS_PUBLIC_SUBNET_ID = env(PUBLIC_SUBNET_ID)' generated/$CLUSTER/cluster-config.yaml
@@ -59,6 +82,12 @@ then
   yq e -i '.NODE_MACHINE_TYPE = env(AWS_NODE_MACHINE_TYPE)' generated/$CLUSTER/cluster-config.yaml
   yq e -i '.pinniped.supervisor_svc_endpoint = env(supervisor_svc_endpoint)' generated/$CLUSTER/cluster-config.yaml
   yq e -i '.supervisor_svc_endpoint = env(supervisor_svc_endpoint)' generated/$CLUSTER/cluster-config.yaml
+  if [ "$AUTOSCALER_ENABLED" = "true" ];
+  then
+    yq e -i '.ENABLE_AUTOSCALER = env(AUTOSCALER_ENABLED)' generated/$CLUSTER/cluster-config.yaml
+    yq e -i '.AUTOSCALER_MIN_SIZE_0 = env(WORKER_REPLICAS)' generated/$CLUSTER/cluster-config.yaml
+    yq e -i '.AUTOSCALER_MAX_SIZE_0 = env(WORKER_AUTOSCALER_MAX_NODES)' generated/$CLUSTER/cluster-config.yaml
+  fi
 
   tanzu cluster create --file=generated/$CLUSTER/cluster-config.yaml $KUBERNETES_VERSION_FLAG_AND_VALUE -v 6
 
