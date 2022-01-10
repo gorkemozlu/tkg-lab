@@ -39,3 +39,5 @@ helm repo add bitnami https://charts.bitnami.com/bitnami
 
 kubectl apply -f generated/$CLUSTER_NAME/kubeapps/01-namespace.yaml
 helm upgrade --install kubeapps --namespace kubeapps bitnami/kubeapps -f generated/$CLUSTER_NAME/kubeapps/kubeapps-values.yaml --version=5.3.4
+# helm delete kubeapps -n kubeapps
+# helm upgrade --install kubeapps --namespace kubeapps bitnami/kubeapps -f generated/$CLUSTER_NAME/kubeapps/kubeapps-values.yaml --version=7.1.1
