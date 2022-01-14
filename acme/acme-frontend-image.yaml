@@ -1,0 +1,22 @@
+---
+apiVersion: kpack.io/v1alpha2
+kind: Image
+metadata:
+  name: acme-frontend
+  namespace: build
+spec:
+  builder:
+    kind: ClusterBuilder
+    name: default
+  cache:
+    volume:
+      size: 2G
+  failedBuildHistoryLimit: 10
+  imageTaggingStrategy: BuildNumber
+  serviceAccountName: default
+  source:
+    git:
+      revision: master
+      url: https://dev.azure.com/gorkemozlu-tanzu/acme-fitness/_git/frontend
+  successBuildHistoryLimit: 10
+  tag: harbor.dorn.gorke.ml/acme/acme-frontend:v0.0.1
