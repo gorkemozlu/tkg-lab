@@ -1,0 +1,44 @@
+#@ load("@ytt:data", "data")
+---
+apiVersion: vmoperator.vmware.com/v1alpha1
+kind: VirtualMachine
+metadata:
+  name: #@ "vm-svc-"+data.values.name
+  namespace: #@ data.values.namespace
+  labels:
+    app: #@ data.values.name
+spec:
+  imageName: #@ data.values.imageName
+  className: best-effort-medium
+  powerState: poweredOn
+  storageClass: #@ data.values.storageClass
+  networkInterfaces:
+  - networkName: #@ data.values.network_name
+    networkType: #@ data.values.network_type
+  vmMetadata:
+    configMapName: #@ "vm-svc-"+data.values.name
+    transport: OvfEnv
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: #@ "vm-svc-"+data.values.name
+    namespace: #@ data.values.namespace
+data:
+  hostname: #@ data.values.name
+  user-data: #@ data.values.user_data
+---
+apiVersion: vmoperator.vmware.com/v1alpha1
+kind: VirtualMachineService
+metadata:
+  name: #@ "vm-svc-"+data.values.name
+  namespace: #@ data.values.namespace
+spec:
+  selector:
+    app: #@ data.values.name
+  type: LoadBalancer
+  ports:
+  - name: ssh
+    port: 22
+    protocol: TCP
+    targetPort: 22

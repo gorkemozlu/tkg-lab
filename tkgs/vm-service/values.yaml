@@ -1,0 +1,10 @@
+#@data/values
+---
+name: ubuntu-nsxt
+namespace: tanzuns1
+storageClass: tanzu-storage
+network_type: vsphere-distributed # or nsx-t
+network_name: "network-1"
+user_data: |
+  I2Nsb3VkLWNvbmZpZw...
+imageName: ubuntu-20-1621373774638
