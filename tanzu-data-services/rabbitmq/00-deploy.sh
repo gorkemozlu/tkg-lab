@@ -12,8 +12,8 @@ ORG_TOKEN="CHANGEMEAUTHBASE64"
 ORG_BUNDLE_URL="CHANGEMEBUNDLEURL"
 ORG_VERSION="CHANGEMEVERSION"
 ORG_SA="CHANGEMESERVICEACCOUNT"
-TOKEN=$2
-BUNDLE_URL=$(yq e .tanzu-data-services.rabbitmq.bundle $PARAMS_YAML)
+TOKEN=$(yq e .tanzu-data-services.rabbitmq.token $PARAMS_YAML)
+BUNDLE_URL=$(yq e '.tanzu-data-services.rabbitmq.harbor-path +":"+ .tanzu-data-services.rabbitmq.version' $PARAMS_YAML)
 VERSION=$(yq e .tanzu-data-services.rabbitmq.version $PARAMS_YAML)
 SA_NAME=$(yq e .tanzu-data-services.rabbitmq.sa-name $PARAMS_YAML)
 kubectl config use-context $CLUSTER_NAME-admin@$CLUSTER_NAME

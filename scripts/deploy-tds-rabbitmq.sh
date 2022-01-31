@@ -12,8 +12,8 @@ ORG_TOKEN="CHANGEMEAUTHBASE64"
 ORG_BUNDLE_URL="CHANGEMEBUNDLEURL"
 ORG_VERSION="CHANGEMEVERSION"
 ORG_SA="CHANGEMESERVICEACCOUNT"
-TOKEN=$2
-BUNDLE_URL=$(yq e .tanzu-data-services.rabbitmq.bundle $PARAMS_YAML)
+TOKEN=$(yq e .tanzu-data-services.rabbitmq.token $PARAMS_YAML)
+BUNDLE_URL=$(yq e '.tanzu-data-services.rabbitmq.harbor-path +":"+ .tanzu-data-services.rabbitmq.version' $PARAMS_YAML)
 VERSION=$(yq e .tanzu-data-services.rabbitmq.version $PARAMS_YAML)
 SA_NAME=$(yq e .tanzu-data-services.rabbitmq.sa-name $PARAMS_YAML)
 kubectl config use-context $CLUSTER_NAME-admin@$CLUSTER_NAME
@@ -23,12 +23,11 @@ imgpkg copy -b $(yq e .tanzu-data-services.rabbitmq.bundle $PARAMS_YAML)  --to-r
 
 kubectl create ns secretgen-controller
 kubectl apply -f https://github.com/vmware-tanzu/carvel-secretgen-controller/releases/download/v0.7.1/release.yml
-
 mkdir -p generated/$CLUSTER_NAME/rabbitmq/
-cp 01-secret.yaml generated/$CLUSTER_NAME/rabbitmq/01-secret.yaml
-cp 02-package-repo.yaml generated/$CLUSTER_NAME/rabbitmq/02-package-repo.yaml
-cp 03-package-install.yaml generated/$CLUSTER_NAME/rabbitmq/03-package-install.yaml
-cp 03-package-install.yaml generated/$CLUSTER_NAME/rabbitmq/03-package-install.yaml
+cp tanzu-data-services/rabbitmq/01-secret.yaml generated/$CLUSTER_NAME/rabbitmq/01-secret.yaml
+cp tanzu-data-services/rabbitmq/02-package-repo.yaml generated/$CLUSTER_NAME/rabbitmq/02-package-repo.yaml
+cp tanzu-data-services/rabbitmq/03-package-install.yaml generated/$CLUSTER_NAME/rabbitmq/03-package-install.yaml
+cp tanzu-data-services/rabbitmq/03-package-install.yaml generated/$CLUSTER_NAME/rabbitmq/03-package-install.yaml
 
 sed -i -e "s~$ORG_TOKEN~$TOKEN~g" generated/$CLUSTER_NAME/rabbitmq/01-secret.yaml
 sed -i -e "s~$ORG_BUNDLE_URL~$BUNDLE_URL~g" generated/$CLUSTER_NAME/rabbitmq/02-package-repo.yaml
