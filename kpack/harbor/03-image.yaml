@@ -1,0 +1,14 @@
+apiVersion: kpack.io/v1alpha1
+kind: Image
+metadata:
+  name: petclinic-image-harbor
+spec:
+  tag: harbor.dorn.gorky.ml/petclinic/petclinic
+  serviceAccount: harbor-service-account
+  builder:
+    name: my-builder-java-harbor
+    kind: Builder
+  source:
+    git:
+      url: https://github.com/spring-projects/spring-petclinic
+      revision: 82cb521d636b282340378d80a6307a08e3d4a4c4
